@@ -477,4 +477,20 @@ function assert(condition, message) {
   console.log('17. simultaneous reminders share one tone: OK');
 }
 
-console.log('\nall 17 scenarios passed');
+/* ---------- 18: a failure survives the idle edge that follows it -------- */
+{
+  focused = false;
+  const app = mount({ combineMs: 10000, repeat: false });
+  app.status('s18', true);
+  app.error('s18');
+  app.status('s18', false);
+  advance(10000);
+  assert(notifications.length === 1, `expected one reminder, got ${notifications.length}`);
+  assert(
+    notifications[0].title.includes('notify.error.title'),
+    `expected the error copy, got ${notifications[0].title}`,
+  );
+  console.log('18. failure survives the idle edge: OK');
+}
+
+console.log('\nall 18 scenarios passed');

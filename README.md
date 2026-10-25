@@ -5,8 +5,8 @@
 [![npm](https://img.shields.io/npm/v/dsh-plugin-session-notifier)](https://www.npmjs.com/package/dsh-plugin-session-notifier)
 [![license](https://img.shields.io/github/license/slvayf/dsh-plugin-session-notifier)](LICENSE)
 
-DeepSeek Harness 插件。会话跑完、出错，或者停下来等你回答（提问 / 工具授权）时，
-用桌面通知加提示音提醒你，切到别的窗口、全屏看视频或打游戏时也不会错过。
+DeepSeek Harness 会话通知插件。会话跑完、出错，或者停下来等你回答（提问 / 工具授权）时，
+用桌面通知和提示音提醒你。切到别的窗口、全屏看视频或打游戏时也不会错过。
 
 左侧栏有铃铛入口，点开是设置页，所有开关即时生效。界面跟随 DSH 的中英文设置切换。
 
@@ -19,7 +19,7 @@ DeepSeek Harness 插件。会话跑完、出错，或者停下来等你回答（
 | 会话出错 | 低沉的两声提示音 + 错误通知 |
 | 结束的是你正看着的会话 | 约 1 秒后提醒，几乎即时 |
 | 结束的是其他会话 | 等 10 / 20 / 30 秒的合并窗口再提醒，避免连环响 |
-| 10 秒内又继续跑 | 合并成一次提醒 |
+| 结束的是其他会话，在合并窗口内又继续跑 | 合并成一次提醒 |
 | 你没回来看 | 每 30 秒再提醒一次，最多 3 次，页面获得焦点后立即停止 |
 | 子代理 | 不提醒，避免一个任务内部并行时连环响 |
 
@@ -40,21 +40,33 @@ DeepSeek Harness 插件。会话跑完、出错，或者停下来等你回答（
 
 ## 安装
 
-**一、按包名安装（推荐）**。让智能体调用：
+**一、在 DSH 界面里安装**
+
+1. 侧边栏打开「插件」页
+2. 点右上角「+ 添加插件」
+3. 输入框填 `dsh-plugin-session-notifier`，想装指定版本就在包名后加版本，例如 `dsh-plugin-session-notifier@0.1.2`
+4. 安装源可选「中国大陆镜像源」，国内会快很多
+5. 点「安装」
+
+**二、让智能体安装**
 
 ```
 plugin_manager({ action: "install_bundle", target: "dsh-plugin-session-notifier" })
 ```
 
-不写版本号会装最新版。也可以自己在「插件 → 添加插件」里输入 `dsh-plugin-session-notifier`。
-安装源可选「中国大陆镜像源」，国内会快很多。
+不写版本号时，装的是最新的、并且已经过 pnpm 发布观察期的版本。
 
-**二、本地开发**：`plugin_manager({ action: "install_bundle", target: "/绝对路径/dsh-plugin-session-notifier" })`。
+**三、本地开发**
+
+```
+plugin_manager({ action: "install_bundle", target: "/绝对路径/dsh-plugin-session-notifier" })
+```
 
 安装后左侧栏出现铃铛入口，`main` 面板 key 为 `session-notifier`。
 兼容的 DSH 版本由 `package.json` 的 `engines.dsh` 声明，当前为 `>=0.2.1-rc.3`。
 
-升级需要先卸载旧版本再安装新版本，插件管理器不支持原地升级。
+目前 DeepSeek Harness 的插件升级不能原地进行，需要先卸载旧版本，再安装新版本。如果提示某个新版本还处在 pnpm 的发布观察期内
+（默认 24 小时），要么等它过去，要么直接指定版本号安装。
 
 ## 能力边界
 
@@ -84,6 +96,7 @@ plugin_manager({ action: "install_bundle", target: "dsh-plugin-session-notifier"
 | `client.js` | 浏览器半侧，提醒引擎与设置面板 |
 | `cordis.patch.yml` | 插入插件行 |
 | `locale/*.json` | 插件管理器展示用的标题与描述 |
+| `scripts/sync-version.mjs` | 发布时把版本号同步到面板底部 |
 | `test/*.mjs` | 引擎场景、样式、文案的静态检查 |
 | `.github/workflows/` | `ci` 跑检查，`publish` 发 npm |
 

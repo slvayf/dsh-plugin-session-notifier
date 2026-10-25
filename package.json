@@ -49,7 +49,8 @@
   },
   "scripts": {
     "verify": "node test/verify-engine.mjs && node test/check-styles.mjs && node test/check-copy.mjs",
-    "prepublishOnly": "npm run verify"
+    "prepublishOnly": "npm run verify",
+    "version": "node scripts/sync-version.mjs && git add client.js"
   },
   "dsh": {
     "bundle": {

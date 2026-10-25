@@ -61,6 +61,13 @@ for (const [dict, pairs] of [['zh', zh], ['en', en]]) {
   }
 }
 
+// The panel prints the version, so the constant and the manifest must agree.
+const declaredVersion = /const PLUGIN_VERSION = '([^']+)';/.exec(source)?.[1];
+const { version: packageVersion } = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8'));
+if (declaredVersion !== packageVersion) {
+  problems.push(`client.js reports ${declaredVersion}, package.json is ${packageVersion}`);
+}
+
 for (const [locale, dictionary] of [['zh', zh], ['en', en]]) {
   const document = JSON.parse(readFileSync(resolve(root, `locale/${locale}.json`), 'utf8'));
   const meta = document.meta ?? {};

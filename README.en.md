@@ -5,7 +5,7 @@
 [![npm](https://img.shields.io/npm/v/dsh-plugin-session-notifier)](https://www.npmjs.com/package/dsh-plugin-session-notifier)
 [![license](https://img.shields.io/github/license/slvayf/dsh-plugin-session-notifier)](LICENSE)
 
-A DeepSeek Harness bundle. It raises a desktop notification and a short chime when a session finishes,
+A DeepSeek Harness session notification bundle. It raises a desktop notification and a short chime when a session finishes,
 fails, or stops to wait for your answer (a question or a tool approval). Nothing is missed while you
 are in another window, watching a video, or playing a game.
 
@@ -21,7 +21,7 @@ The interface follows DSH's Chinese/English setting.
 | The session fails | A low two-note chime and an error notification |
 | The session you are looking at ends | Reminded after about 1 second, effectively immediate |
 | Any other session ends | Waits out the 10/20/30 second merge window to avoid a burst |
-| It continues within 10 seconds | Merged into one reminder |
+| Any other session resumes inside the merge window | Merged into one reminder |
 | You do not come back | Repeats every 30 seconds, at most 3 times, and stops as soon as the page is focused |
 | Subagent sessions | Silent, so one task's internal fan-out never rings |
 
@@ -43,22 +43,33 @@ The panel says so as well.
 
 ## Install
 
-**1. By package name (recommended).** Ask the agent to call:
+**1. From the DSH interface**
+
+1. Open the **Plugins** page in the sidebar
+2. Choose **+ Add plugin** at the top right
+3. Enter `dsh-plugin-session-notifier`, or name a version, for example `dsh-plugin-session-notifier@0.1.2`
+4. Pick the China mainland registry mirror if you are there, it is much faster
+5. Choose **Install**
+
+**2. Ask the agent**
 
 ```
 plugin_manager({ action: "install_bundle", target: "dsh-plugin-session-notifier" })
 ```
 
-Omitting the version installs the latest one. You can also type `dsh-plugin-session-notifier` into **Plugins → Add plugin** yourself. Pick the
-China mainland registry mirror if you are there, it is much faster.
+Omitting the version installs the newest release that has also cleared pnpm's release-age window.
 
-**2. Local development:** `plugin_manager({ action: "install_bundle", target: "/absolute/path/dsh-plugin-session-notifier" })`.
+**3. Local development**
+
+```
+plugin_manager({ action: "install_bundle", target: "/absolute/path/dsh-plugin-session-notifier" })
+```
 
 After installation the left sidebar shows the bell entry, and the `main` panel key is `session-notifier`.
 Compatible DSH versions are declared by `engines.dsh` in `package.json`, currently `>=0.2.1-rc.3`.
 
-Upgrading means uninstalling the old version and installing the new one. The plugin manager does not
-upgrade in place.
+Upgrading a plugin in DeepSeek Harness does not happen in place: uninstall the old version, then install the new one. If a new version is
+reported as still inside pnpm's release-age window (24 hours by default), wait it out or name the version.
 
 ## Limits
 
@@ -93,6 +104,7 @@ upgrade in place.
 | `client.js` | Browser half: the reminder engine and the settings panel |
 | `cordis.patch.yml` | Inserts the plugin row |
 | `locale/*.json` | Title and description the plugin manager displays |
+| `scripts/sync-version.mjs` | Copies the release version into the panel footer |
 | `test/*.mjs` | Engine scenarios plus static style and copy checks |
 | `.github/workflows/` | `ci` runs the checks, `publish` uploads to npm |
 

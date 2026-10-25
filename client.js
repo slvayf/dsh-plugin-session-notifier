@@ -28,6 +28,8 @@ window.__ModuleLoader__.load({
     /** Monotonic per-page counter: two reminders in one millisecond still need distinct tags. */
     let notificationSeq = 0;
     const RECENT_LIMIT = 12;
+    /** Shown at the foot of the panel; scripts/sync-version.mjs keeps it in step with package.json. */
+    const PLUGIN_VERSION = '0.1.2';
     /** Wait before reminding about the session the user is looking at. */
     const VIEWING_MERGE_MS = 1000;
     /** Two reminders landing together share one tone instead of stacking two. */
@@ -103,6 +105,7 @@ window.__ModuleLoader__.load({
       'notify.test.title': '这是一条测试提醒',
       'notify.test.body': '看到这条通知、听到提示音，就说明提醒已经生效。',
       'session.unknown': '新会话',
+      'footer.version': '版本 {version}',
     };
 
     const en = {
@@ -174,6 +177,7 @@ window.__ModuleLoader__.load({
       'notify.test.title': 'This is a test reminder',
       'notify.test.body': 'If you can see this notification and hear the chime, reminders work.',
       'session.unknown': 'New session',
+      'footer.version': 'Version {version}',
     };
     //#endregion
 
@@ -714,6 +718,9 @@ window.__ModuleLoader__.load({
       });
       if (!settings.repeat || attempt >= settings.repeatMax) return;
       if (!pageIsAway()) return;
+      // A chain already armed for this session would keep its own timer, and its
+      // callback would delete this newer record.
+      cancelRepeat(sessionId);
       const timer = window.setTimeout(() => {
         state.repeats.delete(sessionId);
         if (!pageIsAway()) return;
@@ -745,13 +752,17 @@ window.__ModuleLoader__.load({
      */
     function scheduleEnd(sessionId, kind) {
       const previous = state.pendingEnd.get(sessionId);
+      // A failed turn reports its error and then its idle edge, so an armed error
+      // outranks the finish that follows it. Otherwise every failure would be
+      // announced as an ordinary completion.
+      const effective = previous !== undefined && previous.kind === 'error' ? 'error' : kind;
       if (previous !== undefined) window.clearTimeout(previous.timer);
       const timer = window.setTimeout(() => {
         state.pendingEnd.delete(sessionId);
         if (!eligible(sessionId)) return;
-        deliver(kind, sessionId, 1);
+        deliver(effective, sessionId, 1);
       }, mergeWindowFor(sessionId));
-      state.pendingEnd.set(sessionId, { timer, kind });
+      state.pendingEnd.set(sessionId, { timer, kind: effective });
     }
 
     /**
@@ -1224,6 +1235,8 @@ window.__ModuleLoader__.load({
                     ),
                   ),
             ),
+
+            h('p', { className: 'sen-version' }, t('footer.version', { version: PLUGIN_VERSION })),
           ),
         ),
       );
@@ -1314,6 +1327,7 @@ window.__ModuleLoader__.load({
       '.sen-btn-primary:hover:not(:disabled){background:var(--dsw-alias-button-primary-hover)}',
       '.sen-actions{display:flex;align-items:center;gap:8px;padding:16px 0;border-bottom:.5px solid var(--dsw-alias-border-l2)}',
       '.sen-empty{margin:16px 0;font-size:13px;line-height:20px;color:var(--dsw-alias-label-tertiary)}',
+      '.sen-version{margin:8px 0 0;font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary)}',
       '.sen-recent{list-style:none;margin:0;padding:0}',
       '.sen-recent-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:.5px solid var(--dsw-alias-border-l2);font-size:13px;line-height:20px}',
       '.sen-recent-name{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dsw-alias-label-primary)}',

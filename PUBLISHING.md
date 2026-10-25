@@ -1,13 +1,11 @@
 # 发布
 
-分发方式是 npm 包，没有索引、没有 GitHub Pages、也不依赖插件市场。
-用户按包名安装：让智能体调用 `install_bundle`，或在「插件 → 添加插件」里输入 `dsh-plugin-session-notifier`。
+分发方式是 npm 包。用户按包名安装：让智能体调用 `install_bundle`，或在「插件 → 添加插件」里输入 `dsh-plugin-session-notifier`。
 
 | 项目 | 值 |
 | --- | --- |
 | 包名 | `dsh-plugin-session-notifier`（无 scope） |
 | 仓库 | <https://github.com/slvayf/dsh-plugin-session-notifier> |
-| 当前版本 | `0.1.2` |
 | 兼容 | `engines.dsh: >=0.2.1-rc.3` |
 
 ## 必须同时改的三处
@@ -33,6 +31,9 @@ npm version patch          # 改版本、提交、打 tag，也可以用 minor /
 git push --follow-tags
 ```
 
+版本号同时出现在 `package.json` 和面板底部的 `PLUGIN_VERSION`。`npm version` 的 `version`
+钩子会自动同步后者并把它加进发布提交，`npm run verify` 也会校验两者一致。
+
 `publish.yml` 依次执行：
 
 1. 安装 npm 11.5 或更新版本（OIDC 交换需要）
@@ -41,26 +42,15 @@ git push --follow-tags
 4. `npm publish`，用 GitHub OIDC 换取发布权限，provenance 自动生成
 5. 把 `latest` 标签指向刚发布的版本
 
-**不需要任何长期 token。** 包在 npm 上配置了 Trusted Publisher：
-`GitHub Actions / slvayf / dsh-plugin-session-notifier / publish.yml`，并允许
-`npm publish` 与 `npm dist-tag`，仓库里不保存任何发布凭据。
+使用 npm 上的 Trusted Publisher 发布，不需要任何长期 token。信任的发布者固定为
+`GitHub Actions / slvayf / dsh-plugin-session-notifier / publish.yml`，允许
+`npm publish` 与 `npm dist-tag`。它绑定 workflow 文件名，所以 `publish.yml` 不能改名。
 
-Trusted Publisher 首次配置后处于 *Pending validation*，用它成功发布一次即完成验证。
-
-## 首次发布与 `latest` 标签
-
-npm 为全新的包名创建时，会先写一个临时的 `0.0.0-stage` 占位版本，并可能把 `latest` 留在它上面，
-那样 `npm install dsh-plugin-session-notifier` 会解析到这个只有两个文件的空壳。
-
-`publish.yml` 每次发布成功后都会把 `latest` 指向该版本。万一仍然跑偏，在本地执行
-`npm dist-tag add dsh-plugin-session-notifier@<version> latest`，命令会要求一次交互式验证。
+全新的 Trusted Publisher 配置完成后处于 *Pending validation*，成功发布一次即完成验证。
 
 ## 删除已发布的版本
 
-npm 把删除版本列为敏感操作，必须现场过一次交互式双重验证，**CI 里的发布凭据无权执行**
-（会返回 403 `Granular access tokens that bypass two-factor authentication may not perform this action`）。
-
-只能在本地做：
+npm 把删除版本列为敏感操作，必须现场过一次交互式双重验证。CI 无权执行，只能在本地做：
 
 ```bash
 npm login
@@ -68,11 +58,6 @@ npm unpublish dsh-plugin-session-notifier@<version> --force
 ```
 
 命令会打印一个 `https://www.npmjs.com/auth/cli/<uuid>` 链接，在浏览器里确认即可完成验证。
-
-
-## 升级
-
-插件管理器不支持原地升级。用户升级需要先卸载旧版本再安装新版本，发版说明里写清这一点。
 
 ## 发布前自检
 

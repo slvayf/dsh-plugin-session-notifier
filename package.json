@@ -1,0 +1,67 @@
+{
+  "name": "dsh-plugin-session-notifier",
+  "version": "0.1.2",
+  "description": "Desktop notification and a short chime when a DeepSeek Harness session finishes or stops to wait for your answer.",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "README.en.md",
+    "icon.svg"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "dsh-bundle",
+    "deepseek",
+    "deepseek-harness",
+    "notification",
+    "desktop-notification",
+    "reminder",
+    "session",
+    "web-audio"
+  ],
+  "author": "slvayf",
+  "license": "MIT",
+  "homepage": "https://github.com/slvayf/dsh-plugin-session-notifier#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slvayf/dsh-plugin-session-notifier.git"
+  },
+  "bugs": {
+    "url": "https://github.com/slvayf/dsh-plugin-session-notifier/issues"
+  },
+  "icon": "./icon.svg",
+  "engines": {
+    "dsh": ">=0.2.1-rc.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "verify": "node test/verify-engine.mjs && node test/check-styles.mjs && node test/check-copy.mjs",
+    "prepublishOnly": "npm run verify"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-session"
+      ]
+    }
+  }
+}

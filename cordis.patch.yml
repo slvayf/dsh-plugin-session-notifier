@@ -1,0 +1,3 @@
+- insert:
+    - id: session-notifier
+      name: 'dsh-plugin-session-notifier'

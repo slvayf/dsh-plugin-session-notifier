@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Session Notifier",
+    "description": "A desktop notification and a short chime when a session finishes or stops to wait for you — so a task that ends while you are on another window is not missed."
+  }
+}

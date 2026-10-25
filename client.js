@@ -29,7 +29,7 @@ window.__ModuleLoader__.load({
     let notificationSeq = 0;
     const RECENT_LIMIT = 12;
     /** Shown at the foot of the panel; scripts/sync-version.mjs keeps it in step with package.json. */
-    const PLUGIN_VERSION = '0.1.2';
+    const PLUGIN_VERSION = '0.1.3';
     /** Wait before reminding about the session the user is looking at. */
     const VIEWING_MERGE_MS = 1000;
     /** Two reminders landing together share one tone instead of stacking two. */

@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-session-notifier",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Desktop notification and a short chime when a DeepSeek Harness session finishes or stops to wait for your answer.",
   "type": "module",
   "exports": {
